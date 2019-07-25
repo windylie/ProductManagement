@@ -8,49 +8,15 @@ namespace ProductManagementApi.DataStore
 {
     public class ProductsDataStore
     {
-        public static ProductsDataStore Current { get; } = new ProductsDataStore();
-        public IList<ProductDto> Products { get; set; }
+        public IList<ProductDto> Products { get; private set; }
 
-        public ProductsDataStore()
+        public ProductsDataStore(List<ProductDto> initialProducts)
         {
-            Products = new List<ProductDto>()
-            {
-                new ProductDto()
-                {
-                    Id = "PR0001",
-                    Description = "HP 15-DA0042TX 15.6 inch Laptop [i7]",
-                    Model = "4PZ98PA#ABG",
-                    Brand = "Hp"
-                },
-                new ProductDto()
-                {
-                    Id = "PR0002",
-                    Description = "FFalcon 24F1 24 inch HD LED TV",
-                    Model = "24F1",
-                    Brand = "Falcon"
-                },
-                new ProductDto()
-                {
-                    Id = "PR0003",
-                    Description = "Apple iPhone XR 64GB (White)",
-                    Model = "3801000078",
-                    Brand = "Apple"
-                },
-                new ProductDto()
-                {
-                    Id = "PR0004",
-                    Description = "Panasonic DC-FT7 Tough Camera [4K Video] (Orange)",
-                    Model = "DC-FT7GN-D",
-                    Brand = "Panasonic"
-                },
-                new ProductDto()
-                {
-                    Id = "PR0005",
-                    Description = "Cygnett Protectshield Screen Protector for Fitbit Charge 3",
-                    Model = "CY2852CPPRO",
-                    Brand = "Cygnett"
-                }
-            };
+            Products = initialProducts;
+        }
+
+        public ProductsDataStore() : this(new List<ProductDto>())
+        {
         }
 
         public ProductDto CreateAndReturnNewProduct(CreateAndEditProductDto newProduct)

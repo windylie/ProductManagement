@@ -9,7 +9,12 @@ namespace ProductManagementApi.Controllers
     [Route("api/products")]
     public class ProductController : Controller
     {
-        private ProductsDataStore _productsDataStore = ProductsDataStore.Current;
+        private ProductsDataStore _productsDataStore;
+
+        public ProductController(ProductsDataStore productsDataStore)
+        {
+            _productsDataStore = productsDataStore;
+        }
 
         [HttpGet()]
         public IActionResult GetAllProducts()
