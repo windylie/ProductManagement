@@ -72,9 +72,6 @@ namespace ProductManagementApi.Controllers
             if (!_productsDataStore.IsProductExists(productId))
                 return BadRequest(OperationResponse.Fail("Product is not exist. Please provide a correct id."));
 
-            if (_productsDataStore.IsProductDuplicate(product.Model, product.Brand))
-                return BadRequest(OperationResponse.Fail("This product is already existed. Please update with different data."));
-
             var isUpdated = _productsDataStore.UpdateProductAndReturnStatus(productId, product);
             if (!isUpdated)
             {

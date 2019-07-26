@@ -61,24 +61,6 @@ namespace ProductManagementApiTests.Controller
         }
 
         [Test]
-        public void When_update_cause_duplicate_product_then_return_bad_request()
-        {
-            var duplicateProduct = new CreateAndEditProductDto()
-            {
-                Description = "Laptop",
-                Model = "11111",
-                Brand = "MyProduct"
-            };
-
-            var result = _productController.UpdateProduct("PR001", duplicateProduct);
-            Assert.IsInstanceOf<BadRequestObjectResult>(result);
-
-            var badRequestObj = result as BadRequestObjectResult;
-            var response = badRequestObj.Value as OperationResponse;
-            Assert.IsFalse(response.IsSuccessful);
-        }
-
-        [Test]
         public void When_update_product_then_return_success_and_return_updated_product_route()
         {
             var updateProduct = new CreateAndEditProductDto()
