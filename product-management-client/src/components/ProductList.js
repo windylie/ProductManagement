@@ -1,5 +1,6 @@
 import React from 'react';
 import Loading from './Loading';
+import api from '../api/productManagementApi';
 
 class ProductList extends React.Component {
     state = { productList : [], loading : true };
@@ -49,9 +50,8 @@ class ProductList extends React.Component {
     }
 
     async componentDidMount() {
-        // to do : enable when integrate with backend api
-        // const response = await api.get('/products');
-        // this.setState({ productList : response.data, loading : false });
+        const response = await api.get('/products');
+        this.setState({ productList : response.data, loading : false });
     }
 
     render() {

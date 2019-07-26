@@ -1,90 +1,122 @@
 import React from 'react';
 import ProductFilter from './ProductFilter';
 import EditProduct from './EditProduct';
+import Messages from './Messages';
+import api from '../api/productManagementApi';
 
 const SHOW_MODE = 'SHOW';
 const EDIT_MODE = 'EDIT';
 
 class ProductManagement extends React.Component {
-    state = { productList : [], productId : 0, response : '', mode:SHOW_MODE }
+    state = {
+        productList : [],
+        response : {status: false, messages: []},
+        mode:SHOW_MODE,
+        selectedProduct: null }
 
-    onInputChange = async (productId) => {
-        // to do : enable when integrate with backend api
-        // const response = await api.get('/products/' + productId);
-        // this.setState({
-        //     productList : response.data,
-        //     productId : productId,
-        //     response : '' });
+    async componentDidMount() {
+        await this.getProductList();
     }
 
-    onDeleteBtnClick = async (productId) => {
-        // const url = '/products' + productId;
-        // await api.delete(url)
-        //     .then(res => {
-        //         this.onInputChange(this.state.productId);
-        //     })
-        //     .catch((error) => {
-        //         this.setState({ response: error.response.data.message });
-        //     });
-    }
-
-    onEditBtnClick = () => {
-        this.setState({mode: EDIT_MODE});
-    }
-
-    renderProductDetail() {
-        //const productList = this.state.phoneList;
-        const productList = [{id:"PR001",description:"aaa",model:"bbb",brand:"ccc"}];
-
-        if (!productList || productList.length === 0) {
-            return (
-                <tr>
-                    <td colSpan="5">
-                        No records found
-                    </td>
-                </tr>);
-        }
-
-        return productList.map ((product) => {
-            return (
-                <tbody>
-                    <tr>
-                        <td className="collapsing">Description</td>
-                        <td>{product.description}</td>
-                    </tr>
-                    <tr>
-                        <td className="collapsing">Model</td>
-                        <td>{product.model}</td>
-                    </tr>
-                    <tr>
-                        <td className="collapsing">Brand</td>
-                        <td>{product.brand}</td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            <button className="ui right floated icon button" onClick={this.onDeleteBtnClick}>
-                                <i className="trash alternate icon" />
-                            </button>
-                            <button className="ui right floated icon button" onClick={this.onEditBtnClick}>
-                                <i className="pencil alternate icon" />
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            );
+    getProductList = async() => {
+        const response = await api.get('/products');
+        this.setState({
+            productList : response.data,
+            selectedProduct: null
         });
     }
 
-    renderUI()
-    {
+    onInputChange = async (productId) => {
+        const response = await api.get('/products/' + productId);
+        this.setState({
+            selectedProduct : response.data,
+            response : ''
+        });
+    }
+
+    onDeleteBtnClick = async () => {
+        const url = '/products/' + this.state.selectedProduct.id;
+        await api.delete(url)
+            .then(async (res) => {
+                await this.getProductList();
+                this.setState({
+                    response: {
+                        status: res.data.isSuccessful,
+                        messages: ['Product is deleted successfully!']
+                    }
+                });
+            })
+            .catch((error) => {
+                this.setState({
+                    response: {
+                        status: error.response.data.isSuccessful,
+                        messages: error.response.data.messages
+                    }});
+            });
+    }
+
+    onEditBtnClick = () => {
+        this.setState({mode: EDIT_MODE, response: ''});
+    }
+
+    onUpdated = async (response, productId) => {
+        await this.onInputChange(productId);
+        this.setState({mode: SHOW_MODE, response: response});
+    }
+
+    renderProductDetail() {
+        const product = this.state.selectedProduct;
+
+        if (!product) {
+            return (
+                <tbody>
+                    <tr>
+                        <td colSpan="2">
+                            No records found
+                        </td>
+                    </tr>
+                </tbody>);
+        }
+
+        return (
+            <tbody>
+                <tr>
+                    <td className="collapsing">Description</td>
+                    <td>{product.description}</td>
+                </tr>
+                <tr>
+                    <td className="collapsing">Model</td>
+                    <td>{product.model}</td>
+                </tr>
+                <tr>
+                    <td className="collapsing">Brand</td>
+                    <td>{product.brand}</td>
+                </tr>
+                <tr>
+                    <td colSpan="2">
+                        <button className="ui right floated icon button" onClick={this.onDeleteBtnClick}>
+                            <i className="trash alternate icon" />
+                        </button>
+                        <button className="ui right floated icon button" onClick={this.onEditBtnClick}>
+                            <i className="pencil alternate icon" />
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        );
+
+    }
+
+    renderUI() {
         if (this.state.mode === SHOW_MODE)  {
             return(
-                <table class="ui very basic table">
+                <table className="ui very basic table">
                     {this.renderProductDetail()}
                 </table>
             );
         } else {
-            return <EditProduct />
+            return <EditProduct product={this.state.selectedProduct}
+                                onUpdated={this.onUpdated} />
         }
 
     }
@@ -93,10 +125,11 @@ class ProductManagement extends React.Component {
         return (
             <div className="ui form">
                 <div className="field">
-                    <ProductFilter onProductSelected={this.onInputChange} />
+                    <ProductFilter productList={this.state.productList}
+                                   onProductSelected={this.onInputChange} />
                 </div>
                 {this.renderUI()}
-                <div>{this.state.message}</div>
+                <Messages response={this.state.response} />
             </div>
         );
     };

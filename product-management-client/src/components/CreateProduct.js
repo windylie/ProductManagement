@@ -1,11 +1,16 @@
 import React from 'react';
+import Messages from './Messages';
+import api from '../api/productManagementApi';
 
 class CreateProduct extends React.Component {
     state = {
         description : '',
         model : '',
         brand : '',
-        response : ''}
+        response : {
+            status: false,
+            messages: []
+        }}
 
     onDescriptionChange = (event) => {
         this.setState({ description : event.target.value });
@@ -20,18 +25,25 @@ class CreateProduct extends React.Component {
     }
 
     onBtnClick = () => {
-        // to do : enable when integrate with backend api
-        // const url = '/products';
-        // api.post(url, {
-        //     description : this.state.phoneNo,
-        //     model : this.state.model,
-        //     brand : this.state.brand
-        //     }).then(res => {
-        //         this.setState({ response: 'Successfully added new product!'});
-        //     })
-        //     .catch((error) => {
-        //         this.setState({ response: error.response.data.message });
-        //     });
+        const url = '/products';
+        api.post(url, {
+            description : this.state.description,
+            model : this.state.model,
+            brand : this.state.brand
+            }).then(res => {
+                this.setState({
+                    response: {
+                        status: res.data.isSuccessful,
+                        messages: ['Product is added successfully!']
+                    }});
+            })
+            .catch((error) => {
+                this.setState({
+                    response: {
+                        status: error.response.data.isSuccessful,
+                        messages: error.response.data.messages
+                    }});
+            });
     }
 
     render() {
@@ -58,8 +70,8 @@ class CreateProduct extends React.Component {
                            value={this.state.brand}
                            onChange={this.onBrandChange} />
                 </div>
-                <button className="ui button" onClick={this.onBtnClick}>Add Product</button>
-                <div>{this.state.response}</div>
+                <button className="ui fluid button" onClick={this.onBtnClick}>Add Product</button>
+                <Messages response={this.state.response} />
             </div>
         );
     }
