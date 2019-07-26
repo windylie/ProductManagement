@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ProductManagementApi.DataStore;
 using ProductManagementApi.InputDto;
 using ProductManagementApi.OutputDto;
@@ -17,9 +18,23 @@ namespace ProductManagementApi.Controllers
         }
 
         [HttpGet()]
-        public IActionResult GetAllProducts()
+        public IActionResult GetAllProducts(
+            [FromQuery(Name = "descr")] string descr,
+            [FromQuery(Name = "model")] string model,
+            [FromQuery(Name = "brand")] string brand)
         {
-            return Ok(_productsDataStore.Products);
+            var products = _productsDataStore.Products;
+
+            if(!string.IsNullOrEmpty(descr))
+                products = products.Where(p => p.Description.ToLower().Contains(descr.ToLower())).ToList();
+
+            if (!string.IsNullOrEmpty(model))
+                products = products.Where(p => p.Model.ToLower().Contains(model.ToLower())).ToList();
+
+            if (!string.IsNullOrEmpty(brand))
+                products = products.Where(p => p.Brand.ToLower().Contains(brand.ToLower())).ToList();
+
+            return Ok(products);
         }
 
         [HttpGet("{productId}", Name = "GetSpecificProduct")]
@@ -32,6 +47,8 @@ namespace ProductManagementApi.Controllers
 
             return Ok(product);
         }
+
+        
 
         [HttpPost()]
         public IActionResult CreateNewProduct([FromBody] CreateAndEditProductDto newProduct)

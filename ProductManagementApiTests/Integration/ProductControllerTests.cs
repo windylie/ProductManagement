@@ -45,6 +45,37 @@ namespace ProductManagementApiTests.Integration
             Assert.IsTrue(isProduct2Exists);
         }
 
+        [TestCase("this", "ab", "product", 2)]
+        [TestCase("this", "", "my", 3)]
+        [TestCase("that", "", "", 1)]
+        public async Task When_client_request_get_products_with_filter_then_the_result_is_ok_and_correct_data_are_returned(
+            string description, string model, string brand, int expectedNoOfResult)
+        {
+            //Arrange
+            var product1 = "{'Description':'This is product 1', 'Model':'AB001', 'Brand':'MyProduct'}";
+            var product2 = "{'Description':'This is product 2', 'Model':'AB002', 'Brand':'MyProduct'}";
+            var product3 = "{'Description':'This is product 3', 'Model':'XY001', 'Brand':'MyProduct'}";
+            var product4 = "{'Description':'That is product 1', 'Model':'XY002', 'Brand':'YourProduct'}";
+
+            await CreateData(product1);
+            await CreateData(product2);
+            await CreateData(product3);
+            await CreateData(product4);
+
+            //Act
+            var result = await _client.GetAsync(
+                string.Format("/api/products?descr={0}&model={1}&brand={2}", description, model, brand), 
+                HttpCompletionOption.ResponseContentRead);
+
+            //Assert
+            result.EnsureSuccessStatusCode();
+
+            var resultContent = await result.Content.ReadAsStringAsync();
+            var content = JArray.Parse(resultContent);
+            var noOfResult = content.Children<JObject>().Count();
+            Assert.AreEqual(expectedNoOfResult, noOfResult);
+        }
+
         [Test]
         public async Task When_client_create_a_new_product_then_the_result_is_ok_and_data_is_created_successfully()
         {
