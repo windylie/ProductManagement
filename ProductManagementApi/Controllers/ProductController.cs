@@ -7,6 +7,7 @@ using System.Linq;
 
 namespace ProductManagementApi.Controllers
 {
+    [Authorize]
     [Route("api/products")]
     public class ProductController : Controller
     {

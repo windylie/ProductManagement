@@ -14,11 +14,26 @@ namespace ProductManagementApiTests.Integration
         private ProductManagementApiFactory _factory;
         private HttpClient _client;
 
-        [OneTimeSetUp]
-        public void Setup()
+        [SetUp]
+        public async Task Setup()
         {
             _factory = new ProductManagementApiFactory();
             _client = _factory.CreateClient();
+
+            var token = await CreateUserAndAuthenticate();
+            _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+        }
+
+        private async Task<string> CreateUserAndAuthenticate()
+        {
+            string createUserJson = "{'Username':'user', 'Password':'password'}";
+            var body = new StringContent(createUserJson, Encoding.UTF8, "application/json");
+
+            await _client.PostAsync("/api/users", body);
+            var result = await _client.PostAsync("/api/users/authenticate", body);
+            var resultContent = await result.Content.ReadAsStringAsync();
+            var content = JObject.Parse(resultContent);
+            return content.Value<string>("token");
         }
 
         [Test]
@@ -175,13 +190,6 @@ namespace ProductManagementApiTests.Integration
 
             //Assert
             Assert.AreEqual(HttpStatusCode.NotFound, getProduct2.StatusCode);
-        }
-
-        [OneTimeTearDown]
-        public void TearDown()
-        {
-            _factory.Dispose();
-            _client.Dispose();
         }
 
         private async Task CreateData(string jsonBody)

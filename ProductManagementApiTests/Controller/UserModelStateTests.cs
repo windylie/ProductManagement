@@ -7,28 +7,27 @@ using System.ComponentModel.DataAnnotations;
 namespace ProductManagementApiTests.Controller
 {
     [TestFixture]
-    public class ModelStateTests
+    public class UserModelStateTests
     {
         [TestCaseSource(typeof(TestData), "TestCases")]
         public void When_create_or_update_product_then_validate_all_input(
-            CreateAndEditProductDto dto, int expectedNoOfError)
+            UserAuthenticationDto dto, int expectedNoOfError)
         {
             var result = new List<ValidationResult>();
 
-            var isValid = Validator.TryValidateObject(dto, new ValidationContext(dto), result); 
+            var isValid = Validator.TryValidateObject(dto, new ValidationContext(dto), result);
 
-            Assert.IsFalse(isValid); 
+            Assert.IsFalse(isValid);
             Assert.AreEqual(expectedNoOfError, result.Count);
         }
 
         [Test]
         public void When_all_properties_are_provided_then_return_valid()
         {
-            var dto = new CreateAndEditProductDto()
+            var dto = new UserAuthenticationDto()
             {
-                Description = "Description",
-                Model = "Model",
-                Brand = "Brand"
+                Username = "user",
+                Password = "password",
             };
             var result = new List<ValidationResult>();
 
@@ -45,28 +44,25 @@ namespace ProductManagementApiTests.Controller
                 get
                 {
                     yield return new TestCaseData(
-                        new CreateAndEditProductDto()
+                        new UserAuthenticationDto()
                         {
-                            Description = "",
-                            Model = "",
-                            Brand = ""
-                        }, 3).SetName("When_all_data_empty_return_invalid");
+                            Username = "",
+                            Password = "",
+                        }, 2).SetName("When_all_data_empty_return_invalid");
                     yield return new TestCaseData(
-                        new CreateAndEditProductDto()
+                        new UserAuthenticationDto()
                         {
-                            Description = "",
-                            Model = "Model",
-                            Brand = "Brand"
-                        }, 1).SetName("When_description_empty_return_invalid");
+                            Username = "user",
+                            Password = "",
+                        }, 1).SetName("When_password_empty_return_invalid");
                     yield return new TestCaseData(
-                        new CreateAndEditProductDto()
+                        new UserAuthenticationDto()
                         {
-                            Description = "Description",
-                            Model = "",
-                            Brand = ""
-                        }, 2).SetName("When_model_and_brand_empty_return_invalid");
+                            Username = "",
+                            Password = "password",
+                        }, 1).SetName("When_username_empty_return_invalid");
                 }
-                
+
             }
         }
     }
