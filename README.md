@@ -22,7 +22,13 @@
     npm start
     ```
   Note: frontend application assumes backend is started at port 44326
-  
+
+## Run tests
+
+```
+dotnet test
+```
+
 ## Backend APIs
 
 Backend offers 7 APIs:
@@ -43,7 +49,7 @@ Authorized APIs :
 
 - `DELETE /api/products/{productId}`
       + delete product with id {productId}
-      
+
 AllowAnonymous APIs :
 - `POST /api/users`
       + create new users
@@ -65,4 +71,8 @@ How it works :
 ## Assumptions
 
 - 2 products are deemed same when model and brand are same, this assumption will be used to validate duplication when creating a new product
-      
+
+## Acknowledgement
+
+This repository adapted implementation of JWT Authentication and password hash creation and verification from [https://jasonwatmore.com/post/2018/06/26/aspnet-core-21-simple-api-for-authentication-registration-and-user-management](https://jasonwatmore.com/post/2018/06/26/aspnet-core-21-simple-api-for-authentication-registration-and-user-management)
+

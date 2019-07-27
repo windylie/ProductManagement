@@ -113,7 +113,7 @@ class ProductList extends React.Component {
                              Filter
                     </div>
                 </div>
-                <div class="ui divider"></div>
+                <div className="ui divider"></div>
                 { this.renderResultTable() }
             </div>
         );

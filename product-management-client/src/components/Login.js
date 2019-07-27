@@ -44,6 +44,8 @@ class Login extends React.Component {
             password : this.state.password
             }).then(res => {
                 this.setState({
+                    username : '',
+                    password : '',
                     response: {
                         status: res.data.isSuccessful,
                         messages: ['User is registered successfully! Please login!']
@@ -73,7 +75,7 @@ class Login extends React.Component {
                            value={this.state.password}
                            onChange={this.onPasswordChange} />
                 </div>
-                <div class="ui fluid buttons">
+                <div className="ui fluid buttons">
                     <button className="ui button" onClick={this.onLoginBtnClick}>Login</button>
                     <div className="or"></div>
                     <button className="ui positive button" onClick={this.onRegisterBtnClick}>Register</button>
