@@ -32,6 +32,9 @@ class CreateProduct extends React.Component {
             brand : this.state.brand
             }).then(res => {
                 this.setState({
+                    description : '',
+                    model : '',
+                    brand : '',
                     response: {
                         status: res.data.isSuccessful,
                         messages: ['Product is added successfully!']
